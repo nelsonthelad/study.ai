@@ -1,5 +1,5 @@
 import PyPDF2
-import io
+from fpdf import FPDF
 
 def extract_text_from_pdf(file_path):
     error_message = "Error processing PDF to String"
@@ -20,3 +20,13 @@ def extract_text_from_pdf(file_path):
     except Exception as e:
         print(f"Error processing PDF: {str(e)}")
         return error_message
+
+def gen_pdf_study_guide(text, file_name):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(40, 10, text)
+    pdf.output(file_name)
+
+
+    
