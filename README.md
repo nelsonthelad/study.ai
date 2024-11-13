@@ -1,4 +1,4 @@
-# study.ai (work in progress)
+# study.ai v1.0
 
 ## Overview
 - study.ai is a tool that uses AI to help you study
@@ -13,6 +13,4 @@
 ## Usage
 - Select a PDF file to study
 - The program will extract the text and generate a study guide
-- The study guide will be displayed in the GUI
-
-## Development
+- The Study Guide will be saved to a pdf
