@@ -21,11 +21,16 @@ def extract_text_from_pdf(file_path):
         print(f"Error processing PDF: {str(e)}")
         return error_message
 
-def gen_pdf_study_guide(text, file_name):
+def gen_pdf_study_guide(study_guide: str, file_name: str):
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
-    pdf.cell(40, 10, text)
+    pdf.set_font("Arial", size=12)
+
+    # Split the study guide into lines and add to PDF
+    for line in study_guide.splitlines():
+        pdf.cell(200, 10, txt=line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
+
+    # Save the PDF
     pdf.output(file_name)
 
 

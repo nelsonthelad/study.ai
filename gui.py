@@ -59,9 +59,14 @@ class StudyToolGUI(QMainWindow):
         if text == error_message:
             self.status_label.setText("Error processing PDF to String")
         else:
-            print(text)
+            print("AI Gen Starting")
             study_guide = generate_study_guide(text)
-            gen_pdf_study_guide(study_guide, file_path)
+            print("AI Gen Ending")
+            self.status_label.setText("Generating")
+            print("PDF Coversion Sarting")
+            gen_pdf_study_guide(study_guide, "tester.pdf")
+            print("PDF Conversion Completed")
+            self.status_label.setText("Completed")
 
         
 
