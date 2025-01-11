@@ -15,7 +15,6 @@ class MainApplication(ctk.CTk):
         self.show_frame(HomePage)
 
     def show_frame(self, page_class):
-        """Destroys current frame and replaces it with a new one."""
         if self.current_frame:
             self.current_frame.destroy()
         self.current_frame = page_class(self)
