@@ -2,7 +2,7 @@
 
 ## Overview
 - study.ai is a tool that uses AI to help you study
-- It is built with Python and PyQt5 for the GUI
+- It is built with Python and CustomTkinter for the GUI
 - It uses the OpenAI API to generate study materials
 
 ## Setup
