@@ -1,3 +1,5 @@
+import os
+os.environ['TK_SILENCE_DEPRECATION'] = '1'
 import customtkinter as ctk
 from pages.home_page import HomePage
 
