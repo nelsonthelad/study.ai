@@ -16,10 +16,10 @@ class MainApplication(ctk.CTk):
         self.current_frame = None
         self.show_frame(HomePage)
 
-    def show_frame(self, page_class):
+    def show_frame(self, page_class, *args, **kwargs):
         if self.current_frame:
             self.current_frame.destroy()
-        self.current_frame = page_class(self)
+        self.current_frame = page_class(self, *args, **kwargs)
         self.current_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
 

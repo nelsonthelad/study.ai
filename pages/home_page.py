@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from .upload_page import UploadPage
 from .saved_page import SavedPage
+from tkinter import filedialog
+from pdf_processing import extract_text_from_pdf
 
 
 class HomePage(ctk.CTkFrame):
@@ -22,17 +24,17 @@ class HomePage(ctk.CTkFrame):
         # upload button
         self.upload_button = ctk.CTkButton(
             self, 
-            text="Upload New Study Material", 
+            text="Upload", 
             width=300, 
             height=70,
-            command=self.go_to_upload_page
+            command=self.upload_handle
         )
         self.upload_button.grid(row=1, column=0, pady=15)
 
         # saved button
         self.saved_button = ctk.CTkButton(
             self,
-            text="Saved Practice Problems",
+            text="Saved",
             width=300,
             height=70,
             command=self.go_to_saved_page
@@ -48,8 +50,20 @@ class HomePage(ctk.CTkFrame):
         self.footer_label.grid(row=3, column=0, pady=10)
         
     #logic for upload button
-    def go_to_upload_page(self):
-        self.master.show_frame(UploadPage)
+    def upload_handle(self):
+        try:
+            file_path = filedialog.askopenfilename(
+                title="Select PDF",
+                filetypes=[("PDF files", "*.pdf")],
+                parent=self
+            )
+            if file_path:
+                # Process the PDF
+                text = extract_text_from_pdf(file_path)
+                self.master.show_frame(UploadPage, text=text, filepath=file_path)
+
+        except Exception as e:
+            print(f"Error during file selection: {e}")
 
     def go_to_saved_page(self):
         self.master.show_frame(SavedPage)
