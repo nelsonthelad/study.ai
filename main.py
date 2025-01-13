@@ -11,7 +11,7 @@ class MainApplication(ctk.CTk):
         self.title("study.ai")
         self.geometry("720x480")
         ctk.set_appearance_mode("Dark")  
-        ctk.set_default_color_theme("blue") 
+        ctk.set_default_color_theme("blue")
         
         self.current_frame = None
         self.show_frame(HomePage)

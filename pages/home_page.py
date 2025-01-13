@@ -1,5 +1,7 @@
 import customtkinter as ctk
 from .upload_page import UploadPage
+from .saved_page import SavedPage
+
 
 class HomePage(ctk.CTkFrame):
     def __init__(self, master):
@@ -32,7 +34,8 @@ class HomePage(ctk.CTkFrame):
             self,
             text="Saved Practice Problems",
             width=300,
-            height=70
+            height=70,
+            command=self.go_to_saved_page
         )
         self.saved_button.grid(row=2, column=0, pady=15)
 
@@ -47,3 +50,6 @@ class HomePage(ctk.CTkFrame):
     #logic for upload button
     def go_to_upload_page(self):
         self.master.show_frame(UploadPage)
+
+    def go_to_saved_page(self):
+        self.master.show_frame(SavedPage)

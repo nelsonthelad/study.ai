@@ -29,7 +29,7 @@ class UploadPage(ctk.CTkFrame):
         )
         self.upload_button.grid(row=1, column=0, pady=30)
 
-        #back button
+        # back button
         self.back_button = ctk.CTkButton(
             self,
             text="Menu",
