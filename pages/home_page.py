@@ -4,7 +4,6 @@ from .saved_page import SavedPage
 from tkinter import filedialog
 from pdf_processing import extract_text_from_pdf
 
-
 class HomePage(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -12,7 +11,7 @@ class HomePage(ctk.CTkFrame):
         # grid system setup
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure((0, 3), weight=1)
-        
+
         # header
         self.header_label = ctk.CTkLabel(
             self,
