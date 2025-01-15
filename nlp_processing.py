@@ -9,7 +9,37 @@ def generate_study_questions(text: str) -> str:
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are an AI that creates study questions by summarizing text and taking out the key concepts. You will create five multiple choice questions based off the given study material"},
+            {"role": "system",
+             "content": """You are an AI that creates study questions by summarizing text and taking out the key concepts. 
+                You will create five multiple choice questions based off the given study material. 
+                I want you to only give me output with the following base format {
+                "questions": [
+                    {
+                    "id": 1,
+                    "question": "What is the main idea of slide 3?",
+                    "options": [
+                        "Option A",
+                        "Option B",
+                        "Option C",
+                        "Option D"
+                    ],
+                    "answer": "Option B",
+                    "explanation": "Slide 3 focuses on..."
+                    },
+                    {
+                    "id": 2,
+                    "question": "Describe the key concept introduced on slide 5.",
+                    "options": [],
+                    "answer": "Open-ended",
+                    "explanation": null
+                    }
+                ],
+                "metadata": {
+                    "source": "input.pdf",
+                    "generated_on": "2025-01-15",
+                    "total_questions": 5
+                }
+                }"""},
             {"role": "user", "content": f"Create five multiple choice questions for me based on this study material {text}"}
         ],
     )

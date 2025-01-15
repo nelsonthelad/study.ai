@@ -1,6 +1,30 @@
 import customtkinter as ctk
 import os
 from nlp_processing import generate_study_questions
+import json
+
+class QuestionsFrame(ctk.CTkScrollableFrame):
+    def __init__(self, master, questions=None):
+        super().__init__(master)
+
+        self.grid_columnconfigure(0, weight=1)
+
+        self.output = questions if questions is not None else "No text available"
+
+        data = json.loads(self.output)
+
+        i = 0
+        for question in data['questions']:
+            question_label = ctk.CTkLabel(
+                self,
+                text=f"({i + 1}.) {question['question']}",
+                font=ctk.CTkFont(size=16),
+                wraplength=400,
+                justify="left"
+            )
+            question_label.grid(row=i, sticky="w", pady=15, padx=15)
+            i += 1
+
 
 class LoadingPage(ctk.CTkFrame):
     def __init__(self, master):
@@ -19,30 +43,44 @@ class LoadingPage(ctk.CTkFrame):
         self.loading_label.grid(row=0, column=0, pady=10, padx=10, sticky="nsew")
 
 class OutputFrame(ctk.CTkFrame):
-    def __init__(self, master, output=None):
+    def __init__(self, master, output=None, go_main_menu_command=None):
         super().__init__(master)
 
         self.output = output if output is not None else "No text available"
 
-         # setting up the grid
+        # setting up the grid
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
         # output label
         self.output_label = ctk.CTkLabel(
             self,
-            text="Output:",
+            text="Generated Questions:",
             font=ctk.CTkFont(size=16, weight="bold"),
         )
         self.output_label.grid(row=0, column=0, pady=10, padx=10)
 
-        # output text box
-        self.output_textbox = ctk.CTkTextbox(
+        self.preview_frame = QuestionsFrame(
             self,
-            corner_radius=10
+            questions=self.output
         )
-        self.output_textbox.grid(row=1, column=0, pady=15, padx=15, sticky="nsew")
-        self.output_textbox.insert("0.0", self.output)
+        self.preview_frame.grid(row=1, column=0, sticky="nsew", padx=15)
+
+        # save button
+        self.save_button = ctk.CTkButton(
+            self, 
+            text="Save", 
+            command=go_main_menu_command
+        )
+        self.save_button.grid(row=2, column=0, pady=15, padx=15, sticky="e")
+
+        # study button
+        self.study_button = ctk.CTkButton(
+            self, 
+            text="Study", 
+            command=go_main_menu_command
+        )
+        self.study_button.grid(row=2, column=0, pady=15, padx=15, sticky="w")
 
 
 class PDFTextPreview(ctk.CTkFrame):
@@ -138,5 +176,5 @@ class UploadPage(ctk.CTkFrame):
         self.loading_frame.grid_forget()  # Hide the loading frame
         
         # Create a new text box to display the output
-        self.output_frame = OutputFrame(self, output)
+        self.output_frame = OutputFrame(self, output, go_main_menu_command=self.go_main_menu)
         self.output_frame.grid(row=0, column=1, sticky="nsew")
