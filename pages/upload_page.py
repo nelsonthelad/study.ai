@@ -2,6 +2,7 @@ import customtkinter as ctk
 import os
 from nlp_processing import generate_study_questions
 import json
+from save_processing import save_json_to_file
 
 class QuestionsFrame(ctk.CTkScrollableFrame):
     def __init__(self, master, questions=None):
@@ -17,7 +18,7 @@ class QuestionsFrame(ctk.CTkScrollableFrame):
         for question in data['questions']:
             question_label = ctk.CTkLabel(
                 self,
-                text=f"({i + 1}.) {question['question']}",
+                text=f"({i + 1}) {question['question']}",
                 font=ctk.CTkFont(size=16),
                 wraplength=400,
                 justify="left"
@@ -70,17 +71,32 @@ class OutputFrame(ctk.CTkFrame):
         self.save_button = ctk.CTkButton(
             self, 
             text="Save", 
-            command=go_main_menu_command
+            command=lambda: self.save_question(self.output),
+            text_color_disabled="dark_color"
         )
         self.save_button.grid(row=2, column=0, pady=15, padx=15, sticky="e")
 
         # study button
         self.study_button = ctk.CTkButton(
             self, 
-            text="Study", 
-            command=go_main_menu_command
+            text="Study",
         )
         self.study_button.grid(row=2, column=0, pady=15, padx=15, sticky="w")
+
+    def save_question(self, text=None):
+        dialog = ctk.CTkInputDialog(text="Enter filename to save as:", title="Save File")
+        filename = dialog.get_input()
+
+        if filename:
+            self.save_button['state'] = 'disabled'
+            try:
+                save_json_to_file(text, filename)
+                print(f"File saved as: {filename}")
+            except Exception as e:
+                print(f"Error saving file: {e}")
+                self.save_button['state'] = 'normal'
+        else:
+            print("Save operation cancelled.")
 
 
 class PDFTextPreview(ctk.CTkFrame):
