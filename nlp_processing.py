@@ -1,7 +1,10 @@
 from openai import OpenAI
 
+with open('keys.txt', 'r') as file:
+        KEY = file.read()
+
 def generate_study_questions(text: str) -> str:
-    client = OpenAI()
+    client = OpenAI(api_key=KEY)
     
     response = client.chat.completions.create(
         model="gpt-4o-mini",
