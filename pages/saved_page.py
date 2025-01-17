@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import os
 
 class SavedFrame(ctk.CTkScrollableFrame):
     def __init__(self, master, title, values):
@@ -75,8 +76,7 @@ class SavedPage(ctk.CTkFrame):
         self.grid_rowconfigure(0, weight=1)
         
         #area to store the items
-        values = ["Saved 1", "Saved 2", "Saved 3", "Saved 4", "Saved 5", 
-                 "Saved 6", "Saved 7", "Saved 8", "Saved 9", "Saved 10"]
+        values = self.get_saved_files()
         
         self.saved_scroll_frame = SavedFrame(self, title="Saved", values=values)
         self.saved_scroll_frame.grid(row=0, column=0, sticky="nsew")
@@ -102,3 +102,10 @@ class SavedPage(ctk.CTkFrame):
     def go_main_menu(self):
         from .home_page import HomePage
         self.master.show_frame(HomePage)
+
+    def get_saved_files(self):
+        directory = "saved"
+
+        files = [os.path.splitext(file)[0] for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
+
+        return files
