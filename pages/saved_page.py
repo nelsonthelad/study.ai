@@ -1,71 +1,94 @@
 import customtkinter as ctk
 import os
+import json
 
 class SavedFrame(ctk.CTkScrollableFrame):
-    def __init__(self, master, title, values):
-        super().__init__(master, label_text=title)
+    def __init__(self, master, title, values, info_frame):
+        super().__init__(master, label_text=title, scrollbar_button_color="#333333", scrollbar_button_hover_color="#333333")
         self.grid_columnconfigure(0, weight=1)
         self.values = values
         self.saved_data = []
+        self.info_frame = info_frame
         
-        # Initialize the checkboxes list
         self.checkboxes = []
 
         for i, value in enumerate(self.values):
             checkbox = ctk.CTkCheckBox(
                 self,
                 text=value,
-                command=lambda i=i: self.select_checkbox(i)  # Pass the index instead
+                command=lambda i=i: self.select_checkbox(i) 
             )
             checkbox.grid(row=i, column=0, padx=10, pady=(10, 0), sticky="w")
             self.checkboxes.append(checkbox)
 
     def select_checkbox(self, selected_index):
-        # Deselect all checkboxes except the selected one
         for i, checkbox in enumerate(self.checkboxes):
             if i != selected_index:
                 checkbox.deselect()
             else:
                 checkbox.select()
+                filename = self.values[selected_index]
+                data = self.get_file_data(filename)
+                self.info_frame.UpdateInfo(data)
 
+    def get_file_data(self, file=None):
+        if file is None:
+            return None
+        
+        file_path = os.path.join("saved", f"{file}.json")
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as f:
+                return json.load(f)
+        return None
 
-class PreviewFrame(ctk.CTkFrame):
+class InfoFrame(ctk.CTkScrollableFrame):
     def __init__(self, master):
-        super().__init__(master)
+        super().__init__(master, label_text="Info", scrollbar_button_color="#333333", scrollbar_button_hover_color="#333333")
 
         #grid setup
-        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(4, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
         #labels
-        self.preview_label = ctk.CTkLabel(
+        self.creation_label = ctk.CTkLabel(
             self,
-            text="Preview",
+            text="Date Created: ",
             font=ctk.CTkFont(size=12, weight="bold")
         )
-        self.preview_label.grid(row=0, column=0, pady=10, padx=15)
+        self.creation_label.grid(row=0, column=0, pady=10, padx=10, sticky="w")
+
+        self.questions_num_label = ctk.CTkLabel(
+            self,
+            text="Number of Questions:",
+            font=ctk.CTkFont(size=12, weight="bold")
+
+        )
+        self.questions_num_label.grid(row=1, column=0, pady=10, padx=10, sticky="w")
 
         self.score_label = ctk.CTkLabel(
             self,
-            text="Score",
+            text="Score: ",
             font=ctk.CTkFont(size=12, weight="bold")
-        )
-        self.score_label.grid(row=0, column=1, pady=10, padx=15)
 
-        #preview and score
-        self.preview_text = ctk.CTkTextbox(
-            self,
-            corner_radius=10,
         )
-        self.preview_text.grid(row=1, column=0, pady=20, padx=15, sticky="ns")
-        self.preview_text.insert("0.0", "Coming soon...")
+        self.score_label.grid(row=2, column=0, pady=10, padx=10, sticky="w")
 
-        self.score_text = ctk.CTkTextbox(
+        self.questions_label = ctk.CTkLabel(
             self,
-            corner_radius=10,
+            text="Questions",
+            fg_color="#3b3b3b",  
+            corner_radius=8,
+            width=130,              
+            height=30,           
+            anchor="center", 
         )
-        self.score_text.grid(row=1, column=1, pady=20, padx=15, sticky="ns")
-        self.score_text.insert("0.0", "Coming soon...")
-        
+        self.questions_label.grid(row=3, column=0, stick="ew")
+
+    def UpdateInfo(self, data=None):
+        if data:
+            self.creation_label.configure(text=f"Date Created: {data.get('metadata', {}).get('generated_on', 'N/A')}")
+            self.questions_num_label.configure(text=f"Number of Questions: {data.get('metadata', {}).get('total_questions', 'N/A')}")
+            self.score_label.configure(text=f"Score: {data.get('score', 'N/A')}")
 
 class SavedPage(ctk.CTkFrame):
     def __init__(self, master):
@@ -75,14 +98,14 @@ class SavedPage(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
         
-        #area to store the items
-        values = self.get_saved_files()
+        # Create InfoFrame first
+        self.info_frame = InfoFrame(self)
+        self.info_frame.grid(row=0, column=1, sticky="nsew", padx=(15,0))
         
-        self.saved_scroll_frame = SavedFrame(self, title="Saved", values=values)
+        # Then create SavedFrame with info_frame reference
+        values = self.get_saved_files()
+        self.saved_scroll_frame = SavedFrame(self, title="Saved", values=values, info_frame=self.info_frame)
         self.saved_scroll_frame.grid(row=0, column=0, sticky="nsew")
-
-        self.preview_frame = PreviewFrame(self)
-        self.preview_frame.grid(row=0, column=1, sticky="nsew")
 
         # back button
         self.back_button = ctk.CTkButton(
@@ -109,3 +132,19 @@ class SavedPage(ctk.CTkFrame):
         files = [os.path.splitext(file)[0] for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
 
         return files
+    
+    def get_file_data(self, file=None):
+        if file is None:
+            return None
+        
+        file_path = os.path.join("saved", f"{file}.json")
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as f:
+                return json.load(f)
+        return None
+        
+
+
+
+
+       

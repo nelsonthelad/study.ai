@@ -36,7 +36,7 @@ def generate_study_questions(text: str) -> str:
                 ],
                 "metadata": {
                     "source": "input.pdf",
-                    "generated_on": "2025-01-15",
+                    "generated_on": "YYYY-MM-DD",
                     "total_questions": 5
                 }
                 }"""},
