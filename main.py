@@ -3,7 +3,6 @@ os.environ['TK_SILENCE_DEPRECATION'] = '1'
 import customtkinter as ctk
 from pages.home_page import HomePage
 
-
 class MainApplication(ctk.CTk):
     def __init__(self):
         super().__init__()

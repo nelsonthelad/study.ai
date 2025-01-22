@@ -9,7 +9,7 @@ class SavedFrame(ctk.CTkScrollableFrame):
         self.values = values
         self.saved_data = []
         self.info_frame = info_frame
-        
+        self.selected_file = None
         self.checkboxes = []
 
         for i, value in enumerate(self.values):
@@ -29,6 +29,7 @@ class SavedFrame(ctk.CTkScrollableFrame):
                 checkbox.select()
                 filename = self.values[selected_index]
                 data = self.get_file_data(filename)
+                self.selected_file = data
                 self.info_frame.UpdateInfo(data)
 
     def get_file_data(self, file=None):
@@ -40,6 +41,10 @@ class SavedFrame(ctk.CTkScrollableFrame):
             with open(file_path, 'r') as f:
                 return json.load(f)
         return None
+    
+    def return_selected_file(self):
+        return self.selected_file
+
 
 class InfoFrame(ctk.CTkScrollableFrame):
     def __init__(self, master):
@@ -84,10 +89,10 @@ class InfoFrame(ctk.CTkScrollableFrame):
         )
         self.questions_label.grid(row=3, column=0, stick="ew")
 
-
-
     def UpdateInfo(self, data=None):
         if data:
+            self.data = data
+            
             self.creation_label.configure(text=f"Date Created: {data.get('metadata', {}).get('generated_on', 'N/A')}")
             self.questions_num_label.configure(text=f"Number of Questions: {data.get('metadata', {}).get('total_questions', 'N/A')}")
             self.score_label.configure(text=f"Score: {data.get('score', 'N/A')}")
@@ -132,7 +137,8 @@ class SavedPage(ctk.CTkFrame):
         # practice button
         self.practice_button = ctk.CTkButton(
             self,
-            text="Practice"
+            text="Practice",
+            command=self.go_study_page
         )
         self.practice_button.grid(row=1, column=1, pady=15)
 
@@ -157,6 +163,13 @@ class SavedPage(ctk.CTkFrame):
                 return json.load(f)
         return None
         
+    def go_study_page(self):
+        data = self.saved_scroll_frame.return_selected_file()
+
+        print(data)
+
+        from .study_page import StudyPage
+        self.master.show_frame(StudyPage, data)
 
 
 
