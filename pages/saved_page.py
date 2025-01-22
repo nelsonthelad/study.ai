@@ -84,11 +84,25 @@ class InfoFrame(ctk.CTkScrollableFrame):
         )
         self.questions_label.grid(row=3, column=0, stick="ew")
 
+
+
     def UpdateInfo(self, data=None):
         if data:
             self.creation_label.configure(text=f"Date Created: {data.get('metadata', {}).get('generated_on', 'N/A')}")
             self.questions_num_label.configure(text=f"Number of Questions: {data.get('metadata', {}).get('total_questions', 'N/A')}")
             self.score_label.configure(text=f"Score: {data.get('score', 'N/A')}")
+
+            i = 0
+            for question in data['questions']:
+                question_label = ctk.CTkLabel(
+                    self,
+                    text=f"({i + 1}) {question['question']}",
+                    font=ctk.CTkFont(size=12),
+                    wraplength=350,
+                    justify="left",
+                )
+                question_label.grid(row=i+4, sticky="nw", pady=15, padx=15)
+                i += 1
 
 class SavedPage(ctk.CTkFrame):
     def __init__(self, master):
