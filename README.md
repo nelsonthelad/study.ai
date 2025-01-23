@@ -1,6 +1,6 @@
 # Study.AI
 
-# Status: Working on showing saved files and in-app quizes
+# Status: Finishing Touches
 
 ## Overview
 - Study.AI is a tool that uses AI to help you study
