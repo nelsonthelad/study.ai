@@ -166,8 +166,6 @@ class SavedPage(ctk.CTkFrame):
     def go_study_page(self):
         data = self.saved_scroll_frame.return_selected_file()
 
-        print(data)
-
         from .study_page import StudyPage
         self.master.show_frame(StudyPage, data)
 
