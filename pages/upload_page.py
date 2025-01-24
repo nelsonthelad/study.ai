@@ -74,14 +74,7 @@ class OutputFrame(ctk.CTkFrame):
             command=lambda: self.save_question(self.output),
             text_color_disabled="dark_color"
         )
-        self.save_button.grid(row=2, column=0, pady=15, padx=15, sticky="e")
-
-        # study button
-        self.study_button = ctk.CTkButton(
-            self, 
-            text="Study",
-        )
-        self.study_button.grid(row=2, column=0, pady=15, padx=15, sticky="w")
+        self.save_button.grid(row=2, column=0, pady=15, padx=15)
 
     def save_question(self, text=None):
         dialog = ctk.CTkInputDialog(text="Enter filename to save as:", title="Save File")
@@ -98,6 +91,8 @@ class OutputFrame(ctk.CTkFrame):
         else:
             print("Save operation cancelled.")
 
+        self.master.go_main_menu()
+        
 
 class PDFTextPreview(ctk.CTkFrame):
      def __init__(self, master, text=None, filepath=None):

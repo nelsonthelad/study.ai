@@ -1,6 +1,6 @@
 # Study.AI
 
-# Status: Finishing Touches
+# Status: Debugging
 
 ## Overview
 - Study.AI is a tool that uses AI to help you study

@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import os
-import json
+from save_processing import get_file_data
+from save_processing import get_correct_q_num
 
 class SavedFrame(ctk.CTkScrollableFrame):
     def __init__(self, master, title, values, info_frame):
@@ -11,6 +12,7 @@ class SavedFrame(ctk.CTkScrollableFrame):
         self.info_frame = info_frame
         self.selected_file = None
         self.checkboxes = []
+        self.filename = None
 
         for i, value in enumerate(self.values):
             checkbox = ctk.CTkCheckBox(
@@ -27,23 +29,16 @@ class SavedFrame(ctk.CTkScrollableFrame):
                 checkbox.deselect()
             else:
                 checkbox.select()
-                filename = self.values[selected_index]
-                data = self.get_file_data(filename)
+                self.filename = self.values[selected_index]
+                data = get_file_data(self.filename)
                 self.selected_file = data
                 self.info_frame.UpdateInfo(data)
-
-    def get_file_data(self, file=None):
-        if file is None:
-            return None
-        
-        file_path = os.path.join("saved", f"{file}.json")
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as f:
-                return json.load(f)
-        return None
     
     def return_selected_file(self):
         return self.selected_file
+    
+    def return_file_name(self):
+        return self.filename
 
 
 class InfoFrame(ctk.CTkScrollableFrame):
@@ -51,7 +46,7 @@ class InfoFrame(ctk.CTkScrollableFrame):
         super().__init__(master, label_text="Info", scrollbar_button_color="#333333", scrollbar_button_hover_color="#333333")
 
         #grid setup
-        self.grid_rowconfigure(4, weight=1)
+        self.grid_rowconfigure(5, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
         #labels
@@ -72,11 +67,18 @@ class InfoFrame(ctk.CTkScrollableFrame):
 
         self.score_label = ctk.CTkLabel(
             self,
-            text="Score: ",
+            text="Best Score: ",
             font=ctk.CTkFont(size=12, weight="bold")
 
         )
         self.score_label.grid(row=2, column=0, pady=10, padx=10, sticky="w")
+
+        self.attempts_label = ctk.CTkLabel(
+            self,
+            text="Attempts: ",
+            font=ctk.CTkFont(size=12, weight="bold")
+        )
+        self.attempts_label.grid(row=3, column=0, pady=10, padx=10, sticky="w")
 
         self.questions_label = ctk.CTkLabel(
             self,
@@ -87,7 +89,7 @@ class InfoFrame(ctk.CTkScrollableFrame):
             height=30,           
             anchor="center", 
         )
-        self.questions_label.grid(row=3, column=0, stick="ew")
+        self.questions_label.grid(row=4, column=0, stick="ew")
 
     def UpdateInfo(self, data=None):
         if data:
@@ -95,7 +97,8 @@ class InfoFrame(ctk.CTkScrollableFrame):
             
             self.creation_label.configure(text=f"Date Created: {data.get('metadata', {}).get('generated_on', 'N/A')}")
             self.questions_num_label.configure(text=f"Number of Questions: {data.get('metadata', {}).get('total_questions', 'N/A')}")
-            self.score_label.configure(text=f"Score: {data.get('score', 'N/A')}")
+            self.score_label.configure(text=f"Best Score: {get_correct_q_num(data['metadata']['best_score'])}/{data['metadata']['total_questions']}")
+            self.attempts_label.configure(text=f"Attempts: {data['metadata']['attempts']}")
 
             i = 0
             for question in data['questions']:
@@ -106,7 +109,7 @@ class InfoFrame(ctk.CTkScrollableFrame):
                     wraplength=350,
                     justify="left",
                 )
-                question_label.grid(row=i+4, sticky="nw", pady=15, padx=15)
+                question_label.grid(row=i+5, sticky="nw", pady=15, padx=15)
                 i += 1
 
 class SavedPage(ctk.CTkFrame):
@@ -152,24 +155,9 @@ class SavedPage(ctk.CTkFrame):
         files = [os.path.splitext(file)[0] for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
 
         return files
-    
-    def get_file_data(self, file=None):
-        if file is None:
-            return None
-        
-        file_path = os.path.join("saved", f"{file}.json")
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as f:
-                return json.load(f)
-        return None
         
     def go_study_page(self):
         data = self.saved_scroll_frame.return_selected_file()
 
         from .study_page import StudyPage
-        self.master.show_frame(StudyPage, data)
-
-
-
-
-       
+        self.master.show_frame(StudyPage, self.saved_scroll_frame.return_file_name())

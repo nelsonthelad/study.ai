@@ -37,7 +37,9 @@ def generate_study_questions(text: str) -> str:
                 "metadata": {
                     "source": "input.pdf",
                     "generated_on": "YYYY-MM-DD",
-                    "total_questions": 5
+                    "total_questions": "Add the number of Questions as a integer. Example: 5",
+                    "best_score": "N/A",
+                    "attempts": 0
                 }
                 }"""},
             {"role": "user", "content": f"Create five multiple choice questions for me based on this study material {text}"}

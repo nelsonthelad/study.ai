@@ -1,12 +1,18 @@
 import customtkinter as ctk
 import json
+from save_processing import update_best_score
+from save_processing import get_file_data
+from save_processing import update_attemtps
 
 class StudyPage(ctk.CTkFrame):
-    def __init__(self, master, data):
+    def __init__(self, master, filename):
         super().__init__(master)
         self.id = 0
+        self.score = []
+        self.finished = False
+        self.filename = filename
 
-        self.data = data
+        self.data = get_file_data(filename)
         if self.data is None:
              print("No data")
              return
@@ -51,29 +57,44 @@ class StudyPage(ctk.CTkFrame):
         return len(data['questions'])
     
     def update_question(self):
-        if self.id + 1 < self.numquestions:  # Check if there are more questions
+        if self.id + 1 < self.numquestions: 
             self.id += 1
-            self.question_frame.destroy()  # Properly destroy the old frame
+            self.score.append(self.question_frame.result)
+            self.question_frame.destroy() 
             self.question_frame = QuestionFrame(self, id=self.id, data=self.data)
             self.question_frame.grid(row=0, column=0, stick="nsew")
+        else:
+            self.finished = True
+            self.score.append(self.question_frame.result)
+            self.results_frame = ResultsFrame(self, data=self.data, score=self.score)
+            self.question_frame.destroy()
+            self.results_frame.grid(row=0, column=0, stick="nsew")
+            self.submit_button.destroy()
+            self.next_button.destroy()
+            self.quit_button.grid(row=1, column=0, padx=15, pady=15, sticky="nsew")
     
     def check_answer(self):
         self.question_frame.check_answer()
 
     def quit(self):
+        if self.finished:
+            update_best_score(self.filename, self.score)
+            update_attemtps(self.filename)
+
         from .saved_page import SavedPage
         self.master.show_frame(SavedPage)
-
+        
 
 class QuestionFrame(ctk.CTkFrame):
     def __init__(self, master, id, data):
         super().__init__(master)
-        
+
         self.data = data
         self.question_id = id
         self.checkboxes = []
         self.selected_answer = None
-        self.answered = False  # Track if question has been answered
+        self.answered = False
+        self.result = None
 
         self.question = self.get_question(self.data, self.question_id)
 
@@ -137,17 +158,79 @@ class QuestionFrame(ctk.CTkFrame):
         id = self.question_id
         selected = data['questions'][id]['options'][self.selected_answer]
 
-        result = "Correct!" if data['questions'][id]['answer'] == selected else "Incorrect!"
-        
+        if data['questions'][id]['answer'] == selected:
+            self.result = "Correct!"
+        else:
+            self.result = "Incorrect!"
+
         for checkbox in self.checkboxes:
             checkbox.grid_forget()
     
         self.result_label = ctk.CTkLabel(
             self,
-            text=result,
+            text=self.result,
             font=ctk.CTkFont(size=42),
             fg_color="#3b3b3b",  
             corner_radius=8,           
             anchor="center",
         )
         self.result_label.grid(row=3, column=0, pady=100, padx=100, sticky="nsew")
+
+
+class ResultsFrame(ctk.CTkScrollableFrame):
+    def __init__(self, master, data, score):
+        super().__init__(master, scrollbar_button_color="#333333", scrollbar_button_hover_color="#333333")
+
+        self.data = data
+
+        self.score = self.get_score(score=score)
+
+        self.grid_rowconfigure((0,1), weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.result_label = ctk.CTkLabel(
+            self,
+            text="Attempt Score: " + self.score,
+            font=ctk.CTkFont(size=32),
+            fg_color="#3b3b3b",  
+            corner_radius=8,           
+            anchor="center",
+        )
+        self.result_label.grid(row=0, column=0, pady=15, padx=15, sticky="nsew")
+
+        i = 0
+        color = None
+        for i in range(len(score)):
+            if score[i] == "Correct!":
+                color = "green"
+            else:
+                color = "red"
+
+            question_label = ctk.CTkLabel(
+                self,
+                text=f"({i + 1}) {score[i]}",
+                font=ctk.CTkFont(size=12),
+                wraplength=650,
+                justify="center",
+                text_color=color
+            )
+            question_label.grid(row=i+1, pady=15, padx=15)
+            i += 1
+
+    def get_score(self, score):
+        true_counter = 0
+        num_questions = len(score)
+
+        for i in range(len(score)):
+            if score[i] == "Correct!":
+                true_counter += 1
+
+        return f"{true_counter}/{num_questions}"
+
+        
+
+
+
+
+
+
