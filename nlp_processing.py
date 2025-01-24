@@ -9,9 +9,9 @@ def generate_study_questions(text: str) -> str:
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system",
+            {"role": "tutor",
              "content": """You are an AI that creates study questions by summarizing text and taking out the key concepts. 
-                You will create five multiple choice questions based off the given study material. 
+                You will create between five and eight multiple choice questions based off the given study material. 
                 I want you to only give me output with the following base format {
                 "questions": [
                     {
@@ -36,13 +36,13 @@ def generate_study_questions(text: str) -> str:
                 ],
                 "metadata": {
                     "source": "input.pdf",
-                    "generated_on": "YYYY-MM-DD",
+                    "generated_on": "todays date in the following format: YYYY-MM-DD",
                     "total_questions": "Add the number of Questions as a integer. Example: 5",
                     "best_score": "N/A",
                     "attempts": 0
                 }
                 }"""},
-            {"role": "user", "content": f"Create five multiple choice questions for me based on this study material {text}"}
+            {"role": "user", "content": f"Create between five and eight multiple choice questions for me based on this study material {text}"}
         ],
     )
     
